@@ -10,4 +10,5 @@ addons:
     token:
       secure: "aP4tyVSrKVw2DIhRV6fR+88wM9VP5HgJvBHgzufHrfyeoaVZYqy/80ZxtMtkHJ3Fq7jEr7H6V/rbTv6tY/s9LLDr4JOTG5pnTfKrbDrvRzOL/KD1/nSL4s0CEeeL668kmYI6S3fwSSYECW/ojExCFCiELcGUtyGiqy/oMRf5pgJkBCLYTKc36ogD/j9VcVDypYpPC+Rhny2ZysOwi2nHu1eMkRDHC+EaHXDp2WBfAl605xwEUAz9RjS+bbg9mkY+uQIJbdUvIqjbo4b0Ipa7xcXC6KV9H3DA9eGiEb537UwAs+hdcDHK4VXE5aQmcdTo711IK7bt617lQXaCcJduDAR04vEPim04/OYye6wwxtwYtlXJvf/JF0a/9XYRkaD8R2LDhhCNk73+lEvKZ/V1FO4Mx/2+eA6AA6ahYWz7uFi0ezHfNMUFGlqHC2FDEDzurefRsFBfHfTOzZP1R4M/G5AD5gG0GqkucZAOyU1OCWJ0QKKJcz36BRaG2h34W2qn90YHB/kW53ULxjHlGl61iR4qX9MdswcxsCgUtyTLmxqvoo/WjiaCup3fxdExZAYUPOS5J6ViOhL8xFrvaBZTWRzR+pHbQaQJNnhh14xuQS0iEmAEyS0X7IXjlLFF45R4bpkw93b9LwNi7LecNB526SDU6h1a1EVQ18eXYAElj/0="
 script:
+  - sonar-scanner
   - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
