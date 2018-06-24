@@ -1,0 +1,81 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: "db-viewer"
+  description: Simple API allowing consumer to view, update and delete database connection details as well as view basic information.
+  #license:
+  #  name: MIT
+  #  url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
+host: "db-viewer.herokuapp.com"
+basePath: /
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+paths:
+  /connections:
+    x-summary: Connections 
+    get:
+      description: >-
+        List all your available connections.
+      summary: List all connections
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Connection'
+          examples:
+            application/json:
+              - name: my-connection-1
+                hostName: localhost
+                databaseName: testdb
+                userName: admin
+                password: admin
+    post:
+      description: >-
+        You may create new database connections using this action. It takes a JSON
+        object containing a all the connections details.
+      summary: Create new connection
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Connection'
+      responses:
+        201:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Connection'
+          examples:
+            application/json:
+              - name: my-connection-1
+                hostName: localhost
+                databaseName: testdb
+                userName: admin
+                password: admin
+definitions:
+  Connection:
+    title: Connection
+    type: object
+    properties:
+      name:
+        type: string
+      hostName:
+        type: string
+      databaseName:
+        type: string
+      userName:
+        type: string
+      password:
+        type: string
+    required:
+      - name
+      - hostName
+      - databaseName
+      - userName
+      - password
