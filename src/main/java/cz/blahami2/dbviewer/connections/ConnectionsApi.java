@@ -39,21 +39,21 @@ public class ConnectionsApi {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody Connection connection){
+    public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody Connection connection) {
         log.debug("updating connection: {}", connection);
         Connection updatedConnection = connectionsService.update(connection);
         return ResponseEntity.ok(updatedConnection);
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Connection> deleteConnection(@PathVariable("id") Long id){
+    public ResponseEntity<Connection> deleteConnection(@PathVariable("id") Long id) {
         log.debug("deleting connection: {}", id);
         Connection deletedConnection = connectionsService.delete(id);
         return ResponseEntity.ok(deletedConnection);
     }
 
-    private URI getNewResourceLocation(Object id){
-        return  ServletUriComponentsBuilder
+    private URI getNewResourceLocation(Object id) {
+        return ServletUriComponentsBuilder
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(id).toUri();
     }
