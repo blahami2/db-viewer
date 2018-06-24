@@ -42,14 +42,14 @@ public class ConnectionsApi {
         log.debug("updating connection: {}", connection);
         return repository.findById(id)
                 .map(originalConnection -> {
-                    Optional.ofNullable(connection.getName()).ifPresent(name -> originalConnection.setName(name));
-                    Optional.ofNullable(connection.getHostName()).ifPresent(name -> originalConnection.setHostName(name));
-                    Optional.ofNullable(connection.getDatabaseName()).ifPresent(name -> originalConnection.setDatabaseName(name));
-                    Optional.ofNullable(connection.getUserName()).ifPresent(name -> originalConnection.setUserName(name));
-                    Optional.ofNullable(connection.getPassword()).ifPresent(name -> originalConnection.setPassword(name));
+                    Optional.ofNullable(connection.getName()).ifPresent(originalConnection::setName);
+                    Optional.ofNullable(connection.getHostName()).ifPresent(originalConnection::setHostName);
+                    Optional.ofNullable(connection.getDatabaseName()).ifPresent(originalConnection::setDatabaseName);
+                    Optional.ofNullable(connection.getUserName()).ifPresent(originalConnection::setUserName);
+                    Optional.ofNullable(connection.getPassword()).ifPresent(originalConnection::setPassword);
                     return repository.save(originalConnection);
                 })
-                .map(updatedConnection -> ResponseEntity.ok(updatedConnection))
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
