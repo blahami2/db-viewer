@@ -6,6 +6,7 @@ import com.jayway.restassured.response.Response;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionRepository;
 import lombok.Builder;
+import lombok.experimental.Wither;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +20,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,29 +70,58 @@ public class ConnectionsApiIT {
     public void addsConnectionAndReturnsResourceOnPost() throws Exception {
         // given
         // - prepare connection
-        ConnectionExt.ConnectionExtBuilder connectionBuilder = ConnectionExt.builder().name("connection3");
-        Connection connection = connectionBuilder.build();
+        ConnectionBuilder builder = new ConnectionBuilder().setName("connection3");
+        Connection connection = builder.build();
         // when
         Response response = api.addConnection(connection);
         // then
         response.then().statusCode(201);
         String actual = response.print();
         // - prepare expected connection (received as response) with ID
-        Connection expectedConnection = connectionBuilder.build();
+        Connection expectedConnection = builder.build();
         String location = response.header("Location");
-        expectedConnection.setId(Long.parseLong(location.replaceAll("^.*/","")));
+        long id = Long.parseLong(location.replaceAll("^.*/", ""));
+        expectedConnection.setId(id);
         String expected = objectMapper.writeValueAsString(expectedConnection);
         // - assert match
         JSONAssert.assertEquals(expected, actual, false);
+        // - assert resource persisted
+        assertThat(repository.findById(id)).contains(expectedConnection);
     }
 
-    @lombok.Value
-    @Builder
-    private static class ConnectionExt extends Connection {
-        @Builder.Default private String name = "connection123";
-        @Builder.Default private String hostName = "hostName123";
-        @Builder.Default private String databaseName = "database123";
-        @Builder.Default private String userName = "userName123";
-        @Builder.Default private String password = "password123";
+    @Test
+    public void updatesConnectionAndReturnsResourceOnPut() throws Exception {
+        // given
+        final String newDbName = "completelyNewDatabaseName123";
+        Connection connection = savedConnections.get(0);
+        connection.setDatabaseName(newDbName);
+        // when
+        Response response = api.updateConnection(connection);
+        // then
+        response.then().statusCode(200);
+        String actual = response.print();
+        // - prepare expected connection
+        String expected = objectMapper.writeValueAsString(connection);
+        // - assert match
+        JSONAssert.assertEquals(expected, actual, false);
+        // - assert resource persisted
+        assertThat(repository.findById(connection.getId())).contains(connection);
+    }
+
+    private static class ConnectionBuilder {
+        private String name = "connection123";
+        private String hostName = "hostName123";
+        private String databaseName = "database123";
+        private String userName = "userName123";
+        private String password = "password123";
+
+        public ConnectionBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Connection build(){
+            return new Connection(name, hostName, databaseName, userName, password);
+        }
     }
 }

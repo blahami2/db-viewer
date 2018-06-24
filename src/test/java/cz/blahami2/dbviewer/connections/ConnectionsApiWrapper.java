@@ -14,14 +14,20 @@ public class ConnectionsApiWrapper {
         this.api = new JsonRestApi();
     }
 
-    public Response getAll(){
+    public Response getAll() {
         return api.givenJsonHeaders()
                 .get(BASE_PATH);
     }
 
-    public Response addConnection(Connection connection){
+    public Response addConnection(Connection connection) {
         return api.givenJsonHeaders()
                 .body(connection)
                 .post(BASE_PATH);
+    }
+
+    public Response updateConnection(Connection connection) {
+        return api.givenJsonHeaders()
+                .body(connection)
+                .put(BASE_PATH + "/" + connection.getId());
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -34,6 +35,22 @@ public class ConnectionsApi {
         Connection savedConnection = repository.save(connection);
         URI location = getNewResourceLocation(savedConnection.getId());
         return ResponseEntity.created(location).body(savedConnection);
+    }
+
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody Connection connection){
+        log.debug("updated connection: {}", connection);
+        return repository.findById(id)
+                .map(originalConnection -> {
+                    Optional.ofNullable(connection.getName()).ifPresent(name -> originalConnection.setName(name));
+                    Optional.ofNullable(connection.getHostName()).ifPresent(name -> originalConnection.setHostName(name));
+                    Optional.ofNullable(connection.getDatabaseName()).ifPresent(name -> originalConnection.setDatabaseName(name));
+                    Optional.ofNullable(connection.getUserName()).ifPresent(name -> originalConnection.setUserName(name));
+                    Optional.ofNullable(connection.getPassword()).ifPresent(name -> originalConnection.setPassword(name));
+                    return repository.save(originalConnection);
+                })
+                .map(updatedConnection -> ResponseEntity.ok(updatedConnection))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     private URI getNewResourceLocation(Object id){

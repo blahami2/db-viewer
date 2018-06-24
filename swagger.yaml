@@ -50,7 +50,37 @@ paths:
         201:
           description: Successful Response
           schema:
-            $ref: '#/definitions/ConnectionResponse'
+            $ref: '#/definitions/ConnectionEntity'
+          examples:
+            application/json:
+              - id: 3
+                name: my-connection-1
+                hostName: localhost
+                databaseName: testdb
+                userName: admin
+                password: admin
+  /connections/{id}:
+    put:
+      description: >-
+        You may update database connections using this action. It takes a JSON
+        object containing the connection details you want to change.
+      summary: Update existing connection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Connection'
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/ConnectionEntity'
           examples:
             application/json:
               - id: 3
@@ -80,8 +110,8 @@ definitions:
       - databaseName
       - userName
       - password
-  ConnectionResponse:
-    title: ConnectionResponse
+  ConnectionEntity:
+    title: ConnectionEntity
     type: object
     properties:
       id:
