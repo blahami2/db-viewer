@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,5 +25,11 @@ public class ConnectionsApi {
         List<Connection> connections = repository.findAll();
         log.debug("requested connections: {}", connections);
         return ResponseEntity.ok(connections);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<Connection> addConnection(@RequestBody Connection connection){
+        Connection savedConnection = repository.save(connection);
+        return ResponseEntity.ok(savedConnection);
     }
 }

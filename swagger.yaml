@@ -50,10 +50,11 @@ paths:
         201:
           description: Successful Response
           schema:
-            $ref: '#/definitions/Connection'
+            $ref: '#/definitions/ConnectionResponse'
           examples:
             application/json:
-              - name: my-connection-1
+              - id: 3
+                name: my-connection-1
                 hostName: localhost
                 databaseName: testdb
                 userName: admin
@@ -74,6 +75,29 @@ definitions:
       password:
         type: string
     required:
+      - name
+      - hostName
+      - databaseName
+      - userName
+      - password
+  ConnectionResponse:
+    title: ConnectionResponse
+    type: object
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      hostName:
+        type: string
+      databaseName:
+        type: string
+      userName:
+        type: string
+      password:
+        type: string
+    required:
+      - id
       - name
       - hostName
       - databaseName

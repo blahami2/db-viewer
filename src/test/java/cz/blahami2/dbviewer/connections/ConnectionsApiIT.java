@@ -5,6 +5,7 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionRepository;
+import lombok.Builder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,12 +41,13 @@ public class ConnectionsApiIT {
     public void setUp() {
         RestAssured.port = serverPort;
         this.api = new ConnectionsApiWrapper();
+        repository.deleteAll();
         savedConnections = CONNECTIONS.stream().map(connection -> repository.save(connection)).collect(Collectors.toList());
     }
 
     @After
     public void tearDown() {
-        savedConnections.forEach(connection -> repository.delete(connection));
+        repository.deleteAll();
     }
 
     @Test
@@ -59,5 +61,33 @@ public class ConnectionsApiIT {
         response.then().statusCode(200);
         String actual = response.print();
         JSONAssert.assertEquals(expected, actual, false);
+    }
+
+    @Test
+    public void addsConnectionAndReturnsResourceOnPost() throws Exception {
+        // given
+        // - prepare connection
+        ConnectionExt.ConnectionExtBuilder connectionBuilder = ConnectionExt.builder().name("connection3");
+        Connection connection = connectionBuilder.build();
+        // - prepare expected connection (received as response) with ID
+        Connection expectedConnection = connectionBuilder.build();
+        expectedConnection.setId(CONNECTIONS.size() + 1L);
+        String expected = objectMapper.writeValueAsString(expectedConnection);
+        // when
+        Response response = api.addConnection(connection);
+        // then
+        response.then().statusCode(200);
+        String actual = response.print();
+        JSONAssert.assertEquals(expected, actual, false);
+    }
+
+    @lombok.Value
+    @Builder
+    private static class ConnectionExt extends Connection {
+        @Builder.Default private String name = "connection123";
+        @Builder.Default private String hostName = "hostName123";
+        @Builder.Default private String databaseName = "database123";
+        @Builder.Default private String userName = "userName123";
+        @Builder.Default private String password = "password123";
     }
 }
