@@ -69,15 +69,17 @@ public class ConnectionsApiIT {
         // - prepare connection
         ConnectionExt.ConnectionExtBuilder connectionBuilder = ConnectionExt.builder().name("connection3");
         Connection connection = connectionBuilder.build();
-        // - prepare expected connection (received as response) with ID
-        Connection expectedConnection = connectionBuilder.build();
-        expectedConnection.setId(CONNECTIONS.size() + 1L);
-        String expected = objectMapper.writeValueAsString(expectedConnection);
         // when
         Response response = api.addConnection(connection);
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(201);
         String actual = response.print();
+        // - prepare expected connection (received as response) with ID
+        Connection expectedConnection = connectionBuilder.build();
+        String location = response.header("Location");
+        expectedConnection.setId(Long.parseLong(location.replaceAll("^.*/","")));
+        String expected = objectMapper.writeValueAsString(expectedConnection);
+        // - assert match
         JSONAssert.assertEquals(expected, actual, false);
     }
 
