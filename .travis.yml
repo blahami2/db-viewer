@@ -1,0 +1,6 @@
+if: branch = master OR branch = develop
+language: java
+jdk:
+ - oraclejdk8
+notifications:
+  email: false
