@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import cz.blahami2.dbviewer.data.entity.Connection;
-import cz.blahami2.dbviewer.data.repository.ConnectionRepository;
+import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class ConnectionsApiIT {
     @Value("${local.server.port}")
     private int serverPort;
     @Autowired
-    private ConnectionRepository repository;
+    private ConnectionsRepository repository;
 
     private ConnectionsApiWrapper api;
     private static final List<Connection> CONNECTIONS = Arrays.asList(
