@@ -6,5 +6,8 @@
 
 # DB viewer
 
+## Check out the API
+- available at [https://app.apiary.io/dbviewer](https://app.apiary.io/dbviewer)
+
 ## Try it out
 - available at [https://db-viewer.herokuapp.com](https://db-viewer.herokuapp.com/)
