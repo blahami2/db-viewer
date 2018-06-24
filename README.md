@@ -5,3 +5,6 @@
 
 
 # DB viewer
+
+## Try it out
+- available at [https://db-viewer.herokuapp.com](https://db-viewer.herokuapp.com/)
