@@ -89,6 +89,29 @@ paths:
                 databaseName: testdb
                 userName: admin
                 password: admin
+    delete:
+      description: >-
+        You may delete database connections using this action.
+      summary: Update existing connection
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/ConnectionEntity'
+          examples:
+            application/json:
+              - id: 3
+                name: my-connection-1
+                hostName: localhost
+                databaseName: testdb
+                userName: admin
+                password: admin
 definitions:
   Connection:
     title: Connection

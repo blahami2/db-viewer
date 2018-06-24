@@ -30,4 +30,9 @@ public class ConnectionsApiWrapper {
                 .body(connection)
                 .put(BASE_PATH + "/" + connection.getId());
     }
+
+    public Response deleteConnection(Long id){
+        return api.givenJsonHeaders()
+                .delete(BASE_PATH + "/" + id);
+    }
 }

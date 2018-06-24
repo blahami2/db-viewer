@@ -5,8 +5,6 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionRepository;
-import lombok.Builder;
-import lombok.experimental.Wither;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// TODO non-happy scenarios
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConnectionsApiIT {
@@ -106,6 +105,23 @@ public class ConnectionsApiIT {
         JSONAssert.assertEquals(expected, actual, false);
         // - assert resource persisted
         assertThat(repository.findById(connection.getId())).contains(connection);
+    }
+
+    @Test
+    public void deletedConnectionAndReturnsResourceOnDelete() throws Exception {
+        // given
+        Connection connection = savedConnections.get(0);
+        // when
+        Response response = api.deleteConnection(connection.getId());
+        // then
+        response.then().statusCode(200);
+        String actual = response.print();
+        // - prepare expected connection
+        String expected = objectMapper.writeValueAsString(connection);
+        // - assert match
+        JSONAssert.assertEquals(expected, actual, false);
+        // - assert resource deleted
+        assertThat(repository.findById(connection.getId())).isEmpty();
     }
 
     private static class ConnectionBuilder {

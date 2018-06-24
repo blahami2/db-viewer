@@ -25,13 +25,13 @@ public class ConnectionsApi {
     @GetMapping
     public ResponseEntity<List<Connection>> getAllConnections() {
         List<Connection> connections = repository.findAll();
-        log.debug("requested connections: {}", connections);
+        log.debug("requesting connections: {}", connections);
         return ResponseEntity.ok(connections);
     }
 
     @PostMapping
     public ResponseEntity<Connection> addConnection(@RequestBody Connection connection) {
-        log.debug("added connection: {}", connection);
+        log.debug("adding connection: {}", connection);
         Connection savedConnection = repository.save(connection);
         URI location = getNewResourceLocation(savedConnection.getId());
         return ResponseEntity.created(location).body(savedConnection);
@@ -39,7 +39,7 @@ public class ConnectionsApi {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody Connection connection){
-        log.debug("updated connection: {}", connection);
+        log.debug("updating connection: {}", connection);
         return repository.findById(id)
                 .map(originalConnection -> {
                     Optional.ofNullable(connection.getName()).ifPresent(name -> originalConnection.setName(name));
@@ -50,6 +50,17 @@ public class ConnectionsApi {
                     return repository.save(originalConnection);
                 })
                 .map(updatedConnection -> ResponseEntity.ok(updatedConnection))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Connection> deleteConnection(@PathVariable("id") Long id){
+        log.debug("deleting connection: {}", id);
+        return repository.findById(id)
+                .map(originalConnection -> {
+                    repository.delete(originalConnection);
+                    return ResponseEntity.ok(originalConnection);
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
