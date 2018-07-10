@@ -13,6 +13,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.getAll();
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         JSONAssert.assertEquals(expected, actual, false);
     }
@@ -74,7 +75,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.addConnection(connection);
         // then
-        response.then().statusCode(201);
+        response.then().statusCode(HttpStatus.CREATED.value());
         String actual = response.print();
         // - prepare expected connection (received as response) with ID
         Connection expectedConnection = builder.build();
@@ -97,7 +98,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.updateConnection(connection);
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         // - prepare expected connection
         String expected = objectMapper.writeValueAsString(connection);
@@ -108,13 +109,13 @@ public class ConnectionsApiIT {
     }
 
     @Test
-    public void deletedConnectionAndReturnsResourceOnDelete() throws Exception {
+    public void deletesConnectionAndReturnsResourceOnDelete() throws Exception {
         // given
         Connection connection = savedConnections.get(0);
         // when
         Response response = api.deleteConnection(connection.getId());
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         // - prepare expected connection
         String expected = objectMapper.writeValueAsString(connection);
@@ -122,6 +123,18 @@ public class ConnectionsApiIT {
         JSONAssert.assertEquals(expected, actual, false);
         // - assert resource deleted
         assertThat(repository.findById(connection.getId())).isEmpty();
+    }
+
+    @Test
+    void addingInvalidConnectionReturnsBadRequest() {
+        // given
+        // - prepare connection
+        ConnectionBuilder builder = new ConnectionBuilder().setName(null);
+        Connection connection = builder.build();
+        // when
+        Response response = api.addConnection(connection);
+        // then
+        response.then().statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     private static class ConnectionBuilder {
