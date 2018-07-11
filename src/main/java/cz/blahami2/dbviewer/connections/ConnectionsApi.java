@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+// TODO add validation service
 @Slf4j
 @RestController
 @RequestMapping(path = "/connections", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,6 +29,13 @@ public class ConnectionsApi {
         log.debug("requesting all connections");
         List<Connection> connections = connectionsService.getAll();
         return ResponseEntity.ok(connections);
+    }
+
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<Connection> getConnection(@PathVariable("id") Long id){
+        log.debug("obtaining connection: {}", id);
+        Connection connection = connectionsService.get(id);
+        return ResponseEntity.ok(connection);
     }
 
     @PostMapping

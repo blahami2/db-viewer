@@ -19,6 +19,11 @@ public class ConnectionsApiWrapper {
                 .get(BASE_PATH);
     }
 
+    public Response getConnection(long id){
+        return api.givenJsonHeaders()
+                .get(BASE_PATH + "/" + id);
+    }
+
     public Response addConnection(Connection connection) {
         return api.givenJsonHeaders()
                 .body(connection)
