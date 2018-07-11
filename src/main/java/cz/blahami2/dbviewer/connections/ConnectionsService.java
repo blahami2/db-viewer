@@ -26,6 +26,10 @@ public class ConnectionsService {
         return repository.save(newConnection);
     }
 
+    public Connection get(long id) {
+        return findOrError(id);
+    }
+
     public Connection update(Connection updatedConnection) {
         Connection originalConnection = findOrError(updatedConnection.getId());
         Optional.ofNullable(updatedConnection.getName()).ifPresent(originalConnection::setName);
