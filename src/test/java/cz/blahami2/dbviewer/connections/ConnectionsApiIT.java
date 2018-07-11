@@ -4,16 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
 import cz.blahami2.dbviewer.data.entity.Connection;
-import cz.blahami2.dbviewer.data.repository.ConnectionRepository;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,14 +23,14 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 // TODO non-happy scenarios
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConnectionsApiIT {
 
     @Value("${local.server.port}")
     private int serverPort;
     @Autowired
-    private ConnectionRepository repository;
+    private ConnectionsRepository repository;
 
     private ConnectionsApiWrapper api;
     private static final List<Connection> CONNECTIONS = Arrays.asList(
@@ -39,7 +40,7 @@ public class ConnectionsApiIT {
     private List<Connection> savedConnections;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         RestAssured.port = serverPort;
         this.api = new ConnectionsApiWrapper();
@@ -47,7 +48,7 @@ public class ConnectionsApiIT {
         savedConnections = CONNECTIONS.stream().map(connection -> repository.save(connection)).collect(Collectors.toList());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         repository.deleteAll();
     }
@@ -60,7 +61,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.getAll();
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         JSONAssert.assertEquals(expected, actual, false);
     }
@@ -74,7 +75,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.addConnection(connection);
         // then
-        response.then().statusCode(201);
+        response.then().statusCode(HttpStatus.CREATED.value());
         String actual = response.print();
         // - prepare expected connection (received as response) with ID
         Connection expectedConnection = builder.build();
@@ -97,7 +98,7 @@ public class ConnectionsApiIT {
         // when
         Response response = api.updateConnection(connection);
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         // - prepare expected connection
         String expected = objectMapper.writeValueAsString(connection);
@@ -108,13 +109,13 @@ public class ConnectionsApiIT {
     }
 
     @Test
-    public void deletedConnectionAndReturnsResourceOnDelete() throws Exception {
+    public void deletesConnectionAndReturnsResourceOnDelete() throws Exception {
         // given
         Connection connection = savedConnections.get(0);
         // when
         Response response = api.deleteConnection(connection.getId());
         // then
-        response.then().statusCode(200);
+        response.then().statusCode(HttpStatus.OK.value());
         String actual = response.print();
         // - prepare expected connection
         String expected = objectMapper.writeValueAsString(connection);
@@ -122,6 +123,18 @@ public class ConnectionsApiIT {
         JSONAssert.assertEquals(expected, actual, false);
         // - assert resource deleted
         assertThat(repository.findById(connection.getId())).isEmpty();
+    }
+
+    @Test
+    void addingInvalidConnectionReturnsBadRequest() {
+        // given
+        // - prepare connection
+        ConnectionBuilder builder = new ConnectionBuilder().setName(null);
+        Connection connection = builder.build();
+        // when
+        Response response = api.addConnection(connection);
+        // then
+        response.then().statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     private static class ConnectionBuilder {
@@ -136,7 +149,7 @@ public class ConnectionsApiIT {
             return this;
         }
 
-        public Connection build(){
+        public Connection build() {
             return new Connection(name, hostName, databaseName, userName, password);
         }
     }
