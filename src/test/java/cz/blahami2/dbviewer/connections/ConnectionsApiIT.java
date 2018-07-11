@@ -67,6 +67,20 @@ public class ConnectionsApiIT {
     }
 
     @Test
+    void returnsConnectionOnGetById() throws Exception {
+        // given
+        Connection connection = savedConnections.get(0);
+        // when
+        Response response = api.getConnection(connection.getId());
+        // then
+        response.then().statusCode(HttpStatus.OK.value());
+        String actual = response.print();
+        String expected = objectMapper.writeValueAsString(connection);
+        // - assert match
+        JSONAssert.assertEquals(expected, actual, false);
+    }
+
+    @Test
     public void addsConnectionAndReturnsResourceOnPost() throws Exception {
         // given
         // - prepare connection
