@@ -2,10 +2,10 @@ package cz.blahami2.dbviewer.connections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.response.Response;
-import cz.blahami2.dbviewer.data.Schema;
+import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
+import lombok.var;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class ConnectionsDetailsApiIT {
     public void getSchemasReturnsSchemas() throws Exception {
         // given
         System.out.println(database.getDockerHost());
-        String expected = objectMapper.writeValueAsString(
+        var expected = objectMapper.writeValueAsString(
                 new Schema[]{
                         new Schema("pg_toast"),
                         new Schema("pg_temp_1"),
@@ -75,9 +75,9 @@ public class ConnectionsDetailsApiIT {
                         new Schema("information_schema")
                 });
         // when
-        Response response = api.getSchemas(connection.getId());
+        var response = api.getSchemas(connection.getId());
         // then
-        String actual = response.print();
+        var actual = response.print();
         response.then().statusCode(HttpStatus.OK.value());
         JSONAssert.assertEquals(expected, actual, false);
     }

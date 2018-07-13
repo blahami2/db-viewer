@@ -1,4 +1,4 @@
-package cz.blahami2.dbviewer.data;
+package cz.blahami2.dbviewer.model;
 
 import lombok.Value;
 

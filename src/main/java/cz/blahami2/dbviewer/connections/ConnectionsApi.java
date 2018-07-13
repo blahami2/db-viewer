@@ -1,5 +1,6 @@
 package cz.blahami2.dbviewer.connections;
 
+import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.List;
 
 // TODO add validation service
@@ -18,10 +20,12 @@ import java.util.List;
 public class ConnectionsApi {
 
     private final ConnectionsService connectionsService;
+    private final DatabaseDetailsService databaseDetailsService;
 
     @Autowired
-    public ConnectionsApi(ConnectionsService connectionsService) {
+    public ConnectionsApi(ConnectionsService connectionsService, DatabaseDetailsService databaseDetailsService) {
         this.connectionsService = connectionsService;
+        this.databaseDetailsService = databaseDetailsService;
     }
 
     @GetMapping
@@ -58,6 +62,14 @@ public class ConnectionsApi {
         log.debug("deleting connection: {}", id);
         Connection deletedConnection = connectionsService.delete(id);
         return ResponseEntity.ok(deletedConnection);
+    }
+
+    @GetMapping(path = "/{id}/schema")
+    public ResponseEntity<List<Schema>> getSchemas(@PathVariable("id") Long id) throws SQLException {
+        log.debug("getting schemas: {}", id);
+        Connection connection = connectionsService.get(id);
+        List<Schema> schemas = databaseDetailsService.getSchemas(connection);
+        return ResponseEntity.ok(schemas);
     }
 
     private URI getNewResourceLocation(Object id) {
