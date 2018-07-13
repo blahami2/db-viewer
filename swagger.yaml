@@ -136,8 +136,6 @@ paths:
           examples:
             application/json:
               - name: "public"
-                owner: 10
-                access: "{postgres=UC/postgres,=UC/postgres}"
   /connections/{id}/schema/{schema_name}/table:
     x-summary: Tables for schema
     get:
@@ -274,10 +272,6 @@ definitions:
     type: object
     properties:
       name:
-        type: string
-      owner:
-        type: integer
-      access:
         type: string
   Table:
     title: Table

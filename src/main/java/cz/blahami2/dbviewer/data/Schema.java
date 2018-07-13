@@ -5,6 +5,4 @@ import lombok.Value;
 @Value
 public class Schema {
     String name;
-    String owner;
-    String access;
 }
