@@ -97,6 +97,25 @@
             <version>2.19.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.tdomzal</groupId>
+            <artifactId>junit-docker-rule</artifactId>
+            <version>0.4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- hotfix, see https://github.com/tdomzal/junit-docker-rule/issues/42 -->
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <version>2.26</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.bundles.repackaged</groupId>
+            <artifactId>jersey-guava</artifactId>
+            <version>2.25.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,5 +142,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
