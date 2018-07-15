@@ -5,6 +5,7 @@ import com.jayway.restassured.RestAssured;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
+import cz.blahami2.dbviewer.model.Table;
 import lombok.var;
 import org.junit.Before;
 import org.junit.Rule;
@@ -64,7 +65,6 @@ public class ConnectionsDetailsApiIT {
     @Test
     public void getSchemasReturnsSchemas() throws Exception {
         // given
-        System.out.println(database.getDockerHost());
         var expected = objectMapper.writeValueAsString(
                 new Schema[]{
                         new Schema("pg_toast"),
@@ -82,4 +82,25 @@ public class ConnectionsDetailsApiIT {
         JSONAssert.assertEquals(expected, actual, false);
     }
 
+    @Test
+    public void getTablesWillReturnTablesForSchema() throws Exception {
+        // given
+        var expected = objectMapper.writeValueAsString(
+                new Table[]{
+                        new Table("sql_parts", "postgres"),
+                        new Table("sql_languages", "postgres"),
+                        new Table("sql_features", "postgres"),
+                        new Table("sql_implementation_info", "postgres"),
+                        new Table("sql_packages", "postgres"),
+                        new Table("sql_sizing", "postgres"),
+                        new Table("sql_sizing_profiles", "postgres")
+                }
+        );
+        // when
+        var response = api.getTables(connection.getId(), "information_schema");
+        // then
+        var actual = response.print();
+        response.then().statusCode(HttpStatus.OK.value());
+        JSONAssert.assertEquals(expected, actual, false);
+    }
 }

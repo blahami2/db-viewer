@@ -3,6 +3,7 @@ package cz.blahami2.dbviewer.connections;
 import cz.blahami2.dbviewer.data.DatabaseConnection;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.model.Schema;
+import cz.blahami2.dbviewer.model.Table;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,17 @@ public class DatabaseDetailsService {
     public List<Schema> getSchemas(Connection connection) throws SQLException {
         return postgresDatabaseConnectionFactory.apply(connection)
                 .getList(
-                        "select nspname from pg_catalog.pg_namespace;",
-                        rs -> new Schema(rs.getString("nspname"))
+                        rs -> new Schema(rs.getString("nspname")),
+                        "select nspname from pg_catalog.pg_namespace;"
+                );
+    }
+
+    public List<Table> getTables(Connection connection, String schemaName) throws SQLException {
+        return postgresDatabaseConnectionFactory.apply(connection)
+                .getList(
+                        rs -> new Table(rs.getString("tablename"), rs.getString("tableowner")),
+                        "select tablename, tableowner from pg_catalog.pg_tables where schemaname = ?;",
+                        schemaName
                 );
     }
 }

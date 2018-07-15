@@ -2,10 +2,7 @@ package cz.blahami2.dbviewer.data;
 
 import lombok.RequiredArgsConstructor;
 
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -26,25 +23,30 @@ public class DatabaseConnection {
      * @return list of T objects
      * @throws SQLException thrown when an error occurs
      */
-    public <T> List<T> getList(String selectSqlCommand, SqlFunction<ResultSet, T> valueFactory) throws SQLException {
-        return getListFromStatement(statement -> {
-            try (ResultSet resultSet = statement.executeQuery(selectSqlCommand)) {
-                List<T> schemas = new ArrayList<>();
-                while (resultSet.next()) {
-                    schemas.add(valueFactory.apply(resultSet));
-                }
-                return schemas;
-            }
-        });
+    public <T> List<T> getList(SqlFunction<ResultSet, T> valueFactory, String selectSqlCommand, Object... arguments) throws SQLException {
+        return getListFromStatement(
+                selectSqlCommand,
+                statement -> {
+                    for (int i = 0; i < arguments.length; i++) {
+                        statement.setObject(i+1, arguments[i]);
+                    }
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        List<T> schemas = new ArrayList<>();
+                        while (resultSet.next()) {
+                            schemas.add(valueFactory.apply(resultSet));
+                        }
+                        return schemas;
+                    }
+                });
     }
 
-    private <T> List<T> getListFromStatement(SqlFunction<Statement, List<T>> dataExtractor) throws SQLException {
+    private <T> List<T> getListFromStatement(String selectSqlCommand, SqlFunction<PreparedStatement, List<T>> dataExtractor) throws SQLException {
         Properties connectionProps = new Properties();
         connectionProps.put("user", username);
         connectionProps.put("password", password);
         String connectionString = "jdbc:" + driver + "://" + hostWithPort + "/" + dbName;
         try (java.sql.Connection con = DriverManager.getConnection(connectionString, connectionProps)) {
-            try (Statement statement = con.createStatement()) {
+            try (PreparedStatement statement = con.prepareStatement(selectSqlCommand)) {
                 return dataExtractor.apply(statement);
             }
         }

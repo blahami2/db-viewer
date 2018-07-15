@@ -2,6 +2,7 @@ package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.model.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -70,6 +71,14 @@ public class ConnectionsApi {
         Connection connection = connectionsService.get(id);
         List<Schema> schemas = databaseDetailsService.getSchemas(connection);
         return ResponseEntity.ok(schemas);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table")
+    public ResponseEntity<List<Table>> getTables(@PathVariable("id") Long id, @PathVariable("schemaName") String schemaName) throws SQLException {
+        log.debug("getting table for connection {} and schema {}", id, schemaName);
+        Connection connection = connectionsService.get(id);
+        List<Table> tables = databaseDetailsService.getTables(connection, schemaName);
+        return ResponseEntity.ok(tables);
     }
 
     private URI getNewResourceLocation(Object id) {
