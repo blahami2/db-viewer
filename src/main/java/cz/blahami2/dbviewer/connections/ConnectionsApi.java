@@ -1,5 +1,6 @@
 package cz.blahami2.dbviewer.connections;
 
+import cz.blahami2.dbviewer.model.Column;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.model.Table;
@@ -37,7 +38,7 @@ public class ConnectionsApi {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Connection> getConnection(@PathVariable("id") Long id){
+    public ResponseEntity<Connection> getConnection(@PathVariable("id") Long id) {
         log.debug("obtaining connection: {}", id);
         Connection connection = connectionsService.get(id);
         return ResponseEntity.ok(connection);
@@ -79,6 +80,18 @@ public class ConnectionsApi {
         Connection connection = connectionsService.get(id);
         List<Table> tables = databaseDetailsService.getTables(connection, schemaName);
         return ResponseEntity.ok(tables);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/column")
+    public ResponseEntity<List<Column>> getColumns(
+            @PathVariable("id") Long id,
+            @PathVariable("schemaName") String schemaName,
+            @PathVariable("tableName") String tableName
+    ) throws SQLException {
+        log.debug("getting columns for connection {}, schema {} and table {}", id, schemaName, tableName);
+        Connection connection = connectionsService.get(id);
+        List<Column> columns = databaseDetailsService.getColumns(connection, schemaName, tableName);
+        return ResponseEntity.ok(columns);
     }
 
     private URI getNewResourceLocation(Object id) {

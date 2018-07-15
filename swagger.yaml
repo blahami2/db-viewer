@@ -136,6 +136,8 @@ paths:
           examples:
             application/json:
               - name: "public"
+                owner: 10
+                access: "{postgres=UC/postgres,=UC/postgres}"
   /connections/{id}/schema/{schema_name}/table:
     x-summary: Tables for schema
     get:
@@ -193,7 +195,7 @@ paths:
           examples:
             application/json:
               - name: "name"
-                owner: "text"
+                type: "text"
   /connections/{id}/schema/{schema_name}/table/{table_name}/preview:
     x-summary: Data preview for table
     get:
@@ -285,7 +287,7 @@ definitions:
     title: Column
     type: object
     properties:
-      column:
+      name:
         type: string
       type:
         type: string
@@ -303,6 +305,3 @@ definitions:
           type: array
           items:
             type: string
-
-
-

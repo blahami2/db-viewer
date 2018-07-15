@@ -2,6 +2,7 @@ package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.data.DatabaseConnection;
 import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.model.Column;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.model.Table;
 import lombok.var;
@@ -24,6 +25,7 @@ import static org.mockito.BDDMockito.*;
 class DatabaseDetailsServiceTest {
 
     private static final String SCHEMA_NAME = "schema123";
+    private static final String TABLE_NAME = "table123";
 
     @Mock
     private Function<Connection, DatabaseConnection> databaseConnectionFactory;
@@ -70,11 +72,33 @@ class DatabaseDetailsServiceTest {
         // when
         var actual = service.getTables(connection, SCHEMA_NAME);
         // then
+        assertSame(expected, actual);
+        // - verify correct lambda function
         DatabaseConnection.SqlFunction<ResultSet, Table> sqlFunction = lambdaCaptor.getValue();
-        willReturn("table123").given(resultSet).getString("tablename");
+        willReturn(TABLE_NAME).given(resultSet).getString("tablename");
         willReturn("owner123").given(resultSet).getString("tableowner");
         Table table = sqlFunction.apply(resultSet);
-        assertEquals("table123", table.getName());
+        assertEquals(TABLE_NAME, table.getName());
         assertEquals("owner123", table.getOwner());
+    }
+
+    @Test
+    void getColumnsReturnsColumnsForGivenConnectionAndSchemaAndTable() throws SQLException {
+        // given
+        var expected = mock(List.class);
+        var lambdaCaptor = ArgumentCaptor.forClass(DatabaseConnection.SqlFunction.class);
+        // - NOTE: SQL correctness tested via IT test
+        given(databaseConnection.getList(lambdaCaptor.capture(), anyString(), eq(SCHEMA_NAME), eq(TABLE_NAME))).willReturn(expected);
+        // when
+        var actual = service.getColumns(connection, SCHEMA_NAME, TABLE_NAME);
+        // then
+        assertSame(expected, actual);
+        // - verify correct lambda function
+        DatabaseConnection.SqlFunction<ResultSet, Column> sqlFunction = lambdaCaptor.getValue();
+        willReturn("name123").given(resultSet).getString("column_name");
+        willReturn("type123").given(resultSet).getString("data_type");
+        Column column = sqlFunction.apply(resultSet);
+        assertEquals("name123", column.getName());
+        assertEquals("type123", column.getType());
     }
 }

@@ -2,6 +2,7 @@ package cz.blahami2.dbviewer.connections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
+import cz.blahami2.dbviewer.model.Column;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
@@ -98,6 +99,23 @@ public class ConnectionsDetailsApiIT {
         );
         // when
         var response = api.getTables(connection.getId(), "information_schema");
+        // then
+        var actual = response.print();
+        response.then().statusCode(HttpStatus.OK.value());
+        JSONAssert.assertEquals(expected, actual, false);
+    }
+
+    @Test
+    public void getColumnsWillReturnColumnsForTable() throws Exception {
+        // given
+        var expected = objectMapper.writeValueAsString(
+                new Column[]{
+                        new Column("name", "text"),
+                        new Column("setting", "text")
+                }
+        );
+        // when
+        var response = api.getColumns(connection.getId(), "pg_catalog", "pg_config");
         // then
         var actual = response.print();
         response.then().statusCode(HttpStatus.OK.value());

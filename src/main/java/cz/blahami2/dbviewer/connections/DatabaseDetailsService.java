@@ -2,6 +2,7 @@ package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.data.DatabaseConnection;
 import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.model.Column;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.model.Table;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,4 +41,14 @@ public class DatabaseDetailsService {
                         schemaName
                 );
     }
+
+    public List<Column> getColumns(Connection connection, String schemaName, String tableName) throws SQLException {
+        return postgresDatabaseConnectionFactory.apply(connection)
+                .getList(
+                        rs -> new Column(rs.getString("column_name"), rs.getString("data_type")),
+                        "SELECT * FROM information_schema.columns WHERE table_schema = ? AND table_name = ?;",
+                        schemaName, tableName
+                );
+    }
+
 }
