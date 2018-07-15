@@ -1,6 +1,7 @@
 package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.model.Column;
+import cz.blahami2.dbviewer.model.Preview;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.model.Table;
@@ -92,6 +93,18 @@ public class ConnectionsApi {
         Connection connection = connectionsService.get(id);
         List<Column> columns = databaseDetailsService.getColumns(connection, schemaName, tableName);
         return ResponseEntity.ok(columns);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/preview")
+    public ResponseEntity<Preview> getPreview(
+            @PathVariable("id") Long id,
+            @PathVariable("schemaName") String schemaName,
+            @PathVariable("tableName") String tableName
+    ) throws SQLException {
+        log.debug("getting preview for connection {}, schema {} and table {}", id, schemaName, tableName);
+        Connection connection = connectionsService.get(id);
+        Preview preview = databaseDetailsService.getPreview(connection, schemaName, tableName);
+        return ResponseEntity.ok(preview);
     }
 
     private URI getNewResourceLocation(Object id) {

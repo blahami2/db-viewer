@@ -3,6 +3,7 @@ package cz.blahami2.dbviewer.connections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import cz.blahami2.dbviewer.model.Column;
+import cz.blahami2.dbviewer.model.Preview;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.domzal.junit.docker.rule.DockerRule;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 
 // TODO wrap DockerRule and migrate to JUnit5
@@ -116,6 +118,26 @@ public class ConnectionsDetailsApiIT {
         );
         // when
         var response = api.getColumns(connection.getId(), "pg_catalog", "pg_config");
+        // then
+        var actual = response.print();
+        response.then().statusCode(HttpStatus.OK.value());
+        JSONAssert.assertEquals(expected, actual, false);
+    }
+
+    @Test
+    public void getPreviewWillReturnDataPreviewForTable() throws Exception {
+        // given
+        var expected = objectMapper.writeValueAsString(
+                new Preview(
+                        Arrays.asList("spcname", "spcowner", "spcacl", "spcoptions"),
+                        Arrays.asList(
+                                Arrays.asList("pg_default", "10", null, null),
+                                Arrays.asList("pg_global", "10", null, null)
+                        )
+                )
+        );
+        // when
+        var response = api.getPreview(connection.getId(), "pg_catalog", "pg_tablespace");
         // then
         var actual = response.print();
         response.then().statusCode(HttpStatus.OK.value());

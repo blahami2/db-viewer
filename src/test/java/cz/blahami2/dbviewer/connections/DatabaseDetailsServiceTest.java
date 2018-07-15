@@ -3,6 +3,7 @@ package cz.blahami2.dbviewer.connections;
 import cz.blahami2.dbviewer.data.DatabaseConnection;
 import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.model.Column;
+import cz.blahami2.dbviewer.model.Preview;
 import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.model.Table;
 import lombok.var;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -41,7 +43,7 @@ class DatabaseDetailsServiceTest {
     @BeforeEach
     void setUp() {
         given(databaseConnectionFactory.apply(connection)).willReturn(databaseConnection);
-        this.service = new DatabaseDetailsService(databaseConnectionFactory);
+        this.service = new DatabaseDetailsService(databaseConnectionFactory, 5);
     }
 
     @Test
@@ -100,5 +102,32 @@ class DatabaseDetailsServiceTest {
         Column column = sqlFunction.apply(resultSet);
         assertEquals("name123", column.getName());
         assertEquals("type123", column.getType());
+    }
+
+    @Test
+    void getPreviewReturnsPreviewForGivenConnectionAndSchemaAndTable() throws SQLException {
+        // given
+        var columns = Arrays.asList(mockColumn("col1"), mockColumn("col2"));
+        service = spy(service);
+        willReturn(columns).given(service).getColumns(connection, SCHEMA_NAME, TABLE_NAME);
+        var list = mock(List.class);
+        var lambdaCaptor = ArgumentCaptor.forClass(DatabaseConnection.SqlFunction.class);
+        // - NOTE: SQL correctness tested via IT test
+        given(databaseConnection.getList(lambdaCaptor.capture(), contains(SCHEMA_NAME + "." + TABLE_NAME))).willReturn(list);
+        var expected = new Preview(Arrays.asList("col1","col2"), list);
+        // when
+        var actual = service.getPreview(connection, SCHEMA_NAME, TABLE_NAME);
+        // then
+        assertEquals(expected, actual);
+        // - verify correct lambda function
+        DatabaseConnection.SqlFunction<ResultSet, List<String>> sqlFunction = lambdaCaptor.getValue();
+        willReturn("value1").given(resultSet).getString(1);
+        willReturn("value2").given(resultSet).getString(2);
+        List<String> values = sqlFunction.apply(resultSet);
+        assertEquals(Arrays.asList("value1", "value2"), values);
+    }
+
+    private Column mockColumn(String name){
+        return new Column(name, "type123"); // class is final
     }
 }
