@@ -1,7 +1,8 @@
 package cz.blahami2.dbviewer.connections;
 
+import cz.blahami2.dbviewer.connections.mapping.ConnectionMapper;
 import cz.blahami2.dbviewer.data.DatabaseConnection;
-import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.model.Connection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,5 +24,10 @@ public class ConnectionsConfiguration {
                 connection.getPassword(),
                 connection.getDatabaseName()
         );
+    }
+
+    @Bean
+    public ConnectionMapper getConnectionMapper(){
+        return new ConnectionMapper();
     }
 }

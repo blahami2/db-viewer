@@ -1,11 +1,7 @@
 package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.data.DatabaseConnection;
-import cz.blahami2.dbviewer.data.entity.Connection;
-import cz.blahami2.dbviewer.model.Column;
-import cz.blahami2.dbviewer.model.Preview;
-import cz.blahami2.dbviewer.model.Schema;
-import cz.blahami2.dbviewer.model.Table;
+import cz.blahami2.dbviewer.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 public class DatabaseDetailsService {

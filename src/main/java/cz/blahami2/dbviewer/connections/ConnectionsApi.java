@@ -1,10 +1,6 @@
 package cz.blahami2.dbviewer.connections;
 
-import cz.blahami2.dbviewer.model.Column;
-import cz.blahami2.dbviewer.model.Preview;
-import cz.blahami2.dbviewer.model.Schema;
-import cz.blahami2.dbviewer.data.entity.Connection;
-import cz.blahami2.dbviewer.model.Table;
+import cz.blahami2.dbviewer.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
@@ -46,7 +43,7 @@ public class ConnectionsApi {
     }
 
     @PostMapping
-    public ResponseEntity<Connection> addConnection(@RequestBody Connection connection) {
+    public ResponseEntity<Connection> addConnection(@RequestBody @Valid Connection connection) {
         log.debug("adding connection: {}", connection);
         Connection savedConnection = connectionsService.add(connection);
         URI location = getNewResourceLocation(savedConnection.getId());
@@ -54,7 +51,7 @@ public class ConnectionsApi {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody Connection connection) {
+    public ResponseEntity<Connection> putConnection(@PathVariable("id") Long id, @RequestBody @Valid Connection connection) {
         log.debug("updating connection: {}", connection);
         Connection updatedConnection = connectionsService.update(connection);
         return ResponseEntity.ok(updatedConnection);

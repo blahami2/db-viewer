@@ -3,25 +3,26 @@ package cz.blahami2.dbviewer.exceptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 // TODO handle more exceptions
+// TODO custom error messages
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         return ResponseEntity.badRequest().body(new ApiError(
                 "Validation has failed",
-                ex.getConstraintViolations().stream()
-                        .map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
-                        .collect(Collectors.toList())
+                Arrays.asList(ex.getMessage())
         ));
     }
 
