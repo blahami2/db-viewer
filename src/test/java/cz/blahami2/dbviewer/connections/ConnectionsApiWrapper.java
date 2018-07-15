@@ -1,7 +1,7 @@
 package cz.blahami2.dbviewer.connections;
 
 import com.jayway.restassured.response.Response;
-import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.data.entity.ConnectionEntity;
 import cz.blahami2.dbviewer.shared.testapi.JsonRestApi;
 
 public class ConnectionsApiWrapper {
@@ -20,13 +20,13 @@ public class ConnectionsApiWrapper {
                 .get(BASE_PATH + "/" + id);
     }
 
-    public Response addConnection(Connection connection) {
+    public Response addConnection(ConnectionEntity connection) {
         return api.givenJsonHeaders()
                 .body(connection)
                 .post(BASE_PATH);
     }
 
-    public Response updateConnection(Connection connection) {
+    public Response updateConnection(ConnectionEntity connection) {
         return api.givenJsonHeaders()
                 .body(connection)
                 .put(BASE_PATH + "/" + connection.getId());

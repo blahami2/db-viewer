@@ -1,11 +1,7 @@
 package cz.blahami2.dbviewer.connections;
 
 import cz.blahami2.dbviewer.data.DatabaseConnection;
-import cz.blahami2.dbviewer.data.entity.Connection;
-import cz.blahami2.dbviewer.model.Column;
-import cz.blahami2.dbviewer.model.Preview;
-import cz.blahami2.dbviewer.model.Schema;
-import cz.blahami2.dbviewer.model.Table;
+import cz.blahami2.dbviewer.model.*;
 import lombok.var;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
