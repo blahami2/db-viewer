@@ -60,10 +60,12 @@ paths:
                 userName: admin
                 password: admin
   /connections/{id}:
+    x-summary: Connection
     put:
       description: >-
         You may update database connections using this action. It takes a JSON
-        object containing the connection details you want to change.
+        object containing the connection details you want to change. Using a subset of properties will change only the provided subset.
+        Null values will be treated as if the
       summary: Update existing connection
       parameters:
         - name: id
@@ -92,7 +94,7 @@ paths:
     delete:
       description: >-
         You may delete database connections using this action.
-      summary: Update existing connection
+      summary: Delete existing connection
       parameters:
         - name: id
           in: path
@@ -112,6 +114,115 @@ paths:
                 databaseName: testdb
                 userName: admin
                 password: admin
+  /connections/{id}/schema:
+    x-summary: Schemas
+    get:
+      description: >-
+        List all schemas in the database
+      summary: List all schemas
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Schema'
+          examples:
+            application/json:
+              - name: "public"
+  /connections/{id}/schema/{schema_name}/table:
+    x-summary: Tables for schema
+    get:
+      description: >-
+        List all tables in the database for the given schema
+      summary: List all tables for schema
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: schema_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Table'
+          examples:
+            application/json:
+              - name: "connection"
+                owner: postgres
+  /connections/{id}/schema/{schema_name}/table/{table_name}/column:
+    x-summary: Columns for table
+    get:
+      description: >-
+        List all columns in the database for the given table
+      summary: List all columns for table
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: schema_name
+          in: path
+          required: true
+          type: string
+        - name: table_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Column'
+          examples:
+            application/json:
+              - name: "name"
+                owner: "text"
+  /connections/{id}/schema/{schema_name}/table/{table_name}/preview:
+    x-summary: Data preview for table
+    get:
+      description: >-
+        List preview data for the given table
+      summary: List preview data for table
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: schema_name
+          in: path
+          required: true
+          type: string
+        - name: table_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Preview'
+          examples:
+            application/json:
+              - headers: ["name", "db_name"]
+                data: [["connection1","testdb"],["connection2","testdb2"]]
 definitions:
   Connection:
     title: Connection
@@ -156,3 +267,42 @@ definitions:
       - databaseName
       - userName
       - password
+  Schema:
+    title: Schema
+    type: object
+    properties:
+      name:
+        type: string
+  Table:
+    title: Table
+    type: object
+    properties:
+      table:
+        type: string
+      owner:
+        type: string
+  Column:
+    title: Column
+    type: object
+    properties:
+      column:
+        type: string
+      type:
+        type: string
+  Preview:
+    title: Preview
+    type: object
+    properties:
+      headers:
+        type: array
+        items:
+          type: string
+      data:
+        type: array
+        items:
+          type: array
+          items:
+            type: string
+
+
+
