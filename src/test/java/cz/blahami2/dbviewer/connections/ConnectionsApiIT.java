@@ -3,7 +3,7 @@ package cz.blahami2.dbviewer.connections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
-import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.data.entity.ConnectionEntity;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,11 +33,11 @@ public class ConnectionsApiIT {
     private ConnectionsRepository repository;
 
     private ConnectionsApiWrapper api;
-    private static final List<Connection> CONNECTIONS = Arrays.asList(
-            new Connection("connection1", "localhost", "testdb", "postgres", "postgres"),
-            new Connection("connection2", "localhost", "testdb", "postgres", "postgres")
+    private static final List<ConnectionEntity> CONNECTIONS = Arrays.asList(
+            new ConnectionEntity("connection1", "localhost", "testdb", "postgres", "postgres"),
+            new ConnectionEntity("connection2", "localhost", "testdb", "postgres", "postgres")
     );
-    private List<Connection> savedConnections;
+    private List<ConnectionEntity> savedConnections;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -69,7 +69,7 @@ public class ConnectionsApiIT {
     @Test
     void returnsConnectionOnGetById() throws Exception {
         // given
-        Connection connection = savedConnections.get(0);
+        ConnectionEntity connection = savedConnections.get(0);
         // when
         Response response = api.getConnection(connection.getId());
         // then
@@ -85,14 +85,14 @@ public class ConnectionsApiIT {
         // given
         // - prepare connection
         ConnectionBuilder builder = new ConnectionBuilder().setName("connection3");
-        Connection connection = builder.build();
+        ConnectionEntity connection = builder.build();
         // when
         Response response = api.addConnection(connection);
         // then
         response.then().statusCode(HttpStatus.CREATED.value());
         String actual = response.print();
         // - prepare expected connection (received as response) with ID
-        Connection expectedConnection = builder.build();
+        ConnectionEntity expectedConnection = builder.build();
         String location = response.header("Location");
         long id = Long.parseLong(location.replaceAll("^.*/", ""));
         expectedConnection.setId(id);
@@ -107,7 +107,7 @@ public class ConnectionsApiIT {
     public void updatesConnectionAndReturnsResourceOnPut() throws Exception {
         // given
         final String newDbName = "completelyNewDatabaseName123";
-        Connection connection = savedConnections.get(0);
+        ConnectionEntity connection = savedConnections.get(0);
         connection.setDatabaseName(newDbName);
         // when
         Response response = api.updateConnection(connection);
@@ -125,7 +125,7 @@ public class ConnectionsApiIT {
     @Test
     public void deletesConnectionAndReturnsResourceOnDelete() throws Exception {
         // given
-        Connection connection = savedConnections.get(0);
+        ConnectionEntity connection = savedConnections.get(0);
         // when
         Response response = api.deleteConnection(connection.getId());
         // then
@@ -144,10 +144,11 @@ public class ConnectionsApiIT {
         // given
         // - prepare connection
         ConnectionBuilder builder = new ConnectionBuilder().setName(null);
-        Connection connection = builder.build();
+        ConnectionEntity connection = builder.build();
         // when
         Response response = api.addConnection(connection);
         // then
+        String s = response.prettyPrint();
         response.then().statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
@@ -163,8 +164,8 @@ public class ConnectionsApiIT {
             return this;
         }
 
-        public Connection build() {
-            return new Connection(name, hostName, databaseName, userName, password);
+        public ConnectionEntity build() {
+            return new ConnectionEntity(name, hostName, databaseName, userName, password);
         }
     }
 }

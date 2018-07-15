@@ -2,10 +2,10 @@ package cz.blahami2.dbviewer.connections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
+import cz.blahami2.dbviewer.data.entity.ConnectionEntity;
 import cz.blahami2.dbviewer.model.Column;
 import cz.blahami2.dbviewer.model.Preview;
 import cz.blahami2.dbviewer.model.Schema;
-import cz.blahami2.dbviewer.data.entity.Connection;
 import cz.blahami2.dbviewer.data.repository.ConnectionsRepository;
 import cz.blahami2.dbviewer.model.Table;
 import lombok.var;
@@ -50,7 +50,7 @@ public class ConnectionsDetailsApiIT {
             .build();
 
     private ConnectionsDetailsApiWrapper api;
-    private Connection connection;
+    private ConnectionEntity connection;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -60,7 +60,7 @@ public class ConnectionsDetailsApiIT {
         this.api = new ConnectionsDetailsApiWrapper();
         repository.deleteAll();
         database.waitForLogMessage("/usr/local/bin/docker-entrypoint.sh:", 5_000);
-        connection = repository.save(new Connection("connection1",
+        connection = repository.save(new ConnectionEntity("connection1",
                 database.getDockerHost() + ":" + database.getExposedContainerPort("5432"), DB_NAME, DB_USER, DB_PASS
         ));
     }
