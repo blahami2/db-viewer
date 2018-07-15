@@ -11,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+// TODO split host and port
 // TODO map to internal immutable model if overused
 // TODO finish validations
 @NoArgsConstructor
@@ -33,7 +34,7 @@ public class Connection extends BaseEntity {
     @Column(name = "database_name", nullable = false)
     @NotEmpty
     @Size(min = 1, max = 128)
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "must contain only alpha-numeric characters or under-scores")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]*$", message = "must contain only alpha-numeric characters, under-scores or hyphens")
     private String databaseName;
 
     @Column(name = "user_name", nullable = false)

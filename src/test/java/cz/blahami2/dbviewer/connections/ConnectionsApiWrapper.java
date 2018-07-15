@@ -8,11 +8,7 @@ public class ConnectionsApiWrapper {
 
     private static final String BASE_PATH = "/connections";
 
-    private final JsonRestApi api;
-
-    public ConnectionsApiWrapper() {
-        this.api = new JsonRestApi();
-    }
+    private final JsonRestApi api = new JsonRestApi();
 
     public Response getAll() {
         return api.givenJsonHeaders()

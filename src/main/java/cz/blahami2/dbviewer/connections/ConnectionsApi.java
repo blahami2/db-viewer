@@ -1,6 +1,10 @@
 package cz.blahami2.dbviewer.connections;
 
+import cz.blahami2.dbviewer.model.Column;
+import cz.blahami2.dbviewer.model.Preview;
+import cz.blahami2.dbviewer.model.Schema;
 import cz.blahami2.dbviewer.data.entity.Connection;
+import cz.blahami2.dbviewer.model.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -9,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.List;
 
 // TODO add validation service
@@ -18,10 +23,12 @@ import java.util.List;
 public class ConnectionsApi {
 
     private final ConnectionsService connectionsService;
+    private final DatabaseDetailsService databaseDetailsService;
 
     @Autowired
-    public ConnectionsApi(ConnectionsService connectionsService) {
+    public ConnectionsApi(ConnectionsService connectionsService, DatabaseDetailsService databaseDetailsService) {
         this.connectionsService = connectionsService;
+        this.databaseDetailsService = databaseDetailsService;
     }
 
     @GetMapping
@@ -32,7 +39,7 @@ public class ConnectionsApi {
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<Connection> getConnection(@PathVariable("id") Long id){
+    public ResponseEntity<Connection> getConnection(@PathVariable("id") Long id) {
         log.debug("obtaining connection: {}", id);
         Connection connection = connectionsService.get(id);
         return ResponseEntity.ok(connection);
@@ -58,6 +65,46 @@ public class ConnectionsApi {
         log.debug("deleting connection: {}", id);
         Connection deletedConnection = connectionsService.delete(id);
         return ResponseEntity.ok(deletedConnection);
+    }
+
+    @GetMapping(path = "/{id}/schema")
+    public ResponseEntity<List<Schema>> getSchemas(@PathVariable("id") Long id) throws SQLException {
+        log.debug("getting schemas: {}", id);
+        Connection connection = connectionsService.get(id);
+        List<Schema> schemas = databaseDetailsService.getSchemas(connection);
+        return ResponseEntity.ok(schemas);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table")
+    public ResponseEntity<List<Table>> getTables(@PathVariable("id") Long id, @PathVariable("schemaName") String schemaName) throws SQLException {
+        log.debug("getting table for connection {} and schema {}", id, schemaName);
+        Connection connection = connectionsService.get(id);
+        List<Table> tables = databaseDetailsService.getTables(connection, schemaName);
+        return ResponseEntity.ok(tables);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/column")
+    public ResponseEntity<List<Column>> getColumns(
+            @PathVariable("id") Long id,
+            @PathVariable("schemaName") String schemaName,
+            @PathVariable("tableName") String tableName
+    ) throws SQLException {
+        log.debug("getting columns for connection {}, schema {} and table {}", id, schemaName, tableName);
+        Connection connection = connectionsService.get(id);
+        List<Column> columns = databaseDetailsService.getColumns(connection, schemaName, tableName);
+        return ResponseEntity.ok(columns);
+    }
+
+    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/preview")
+    public ResponseEntity<Preview> getPreview(
+            @PathVariable("id") Long id,
+            @PathVariable("schemaName") String schemaName,
+            @PathVariable("tableName") String tableName
+    ) throws SQLException {
+        log.debug("getting preview for connection {}, schema {} and table {}", id, schemaName, tableName);
+        Connection connection = connectionsService.get(id);
+        Preview preview = databaseDetailsService.getPreview(connection, schemaName, tableName);
+        return ResponseEntity.ok(preview);
     }
 
     private URI getNewResourceLocation(Object id) {
