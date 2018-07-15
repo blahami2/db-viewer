@@ -2,6 +2,8 @@ if: branch = master OR branch = develop
 language: java
 jdk:
  - oraclejdk8
+services:
+  - docker
 notifications:
   email: false
 addons:
