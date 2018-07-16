@@ -10,7 +10,7 @@
 - REST API capable of storing connection details and basic database analysis (currently only supports _PostgreSQL_)
 
 ### Check out the API
-- available at [https://app.apiary.io/dbviewer](https://app.apiary.io/dbviewer)
+- available at [https://dbviewer.docs.apiary.io/#](https://dbviewer.docs.apiary.io/#)
 
 ### Try it out
 - available at [https://db-viewer.herokuapp.com](https://db-viewer.herokuapp.com/)
