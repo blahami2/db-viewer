@@ -114,7 +114,7 @@ paths:
                 databaseName: testdb
                 userName: admin
                 password: admin
-  /connections/{id}/schema:
+  /connections/{id}/schemas:
     x-summary: Schemas
     get:
       description: >-
@@ -138,7 +138,7 @@ paths:
               - name: "public"
                 owner: 10
                 access: "{postgres=UC/postgres,=UC/postgres}"
-  /connections/{id}/schema/{schema_name}/table:
+  /connections/{id}/schema/{schema_name}/tables:
     x-summary: Tables for schema
     get:
       description: >-
@@ -165,7 +165,7 @@ paths:
             application/json:
               - name: "connection"
                 owner: postgres
-  /connections/{id}/schema/{schema_name}/table/{table_name}/column:
+  /connections/{id}/schema/{schema_name}/table/{table_name}/columns:
     x-summary: Columns for table
     get:
       description: >-
@@ -225,6 +225,43 @@ paths:
             application/json:
               - headers: ["name", "db_name"]
                 data: [["connection1","testdb"],["connection2","testdb2"]]
+  /connections/{id}/schema/{schema_name}/table/{table_name}/statistics:
+    x-summary: Statistics for table
+    get:
+      description: >-
+        List statistics for the given table
+        Filter by provided input
+      summary: List statistics for table
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+          format: int64
+        - name: schema_name
+          in: path
+          required: true
+          type: string
+        - name: table_name
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Statistics'
+          examples:
+            application/json:
+              - num_records: 15
+                num_attributes: 3
 definitions:
   Connection:
     title: Connection
@@ -305,3 +342,11 @@ definitions:
           type: array
           items:
             type: string
+  Statistics:
+    title: Statistics
+    type: object
+    properties:
+      num_records:
+        type: integer
+      num_attributes:
+        type: integer

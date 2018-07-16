@@ -15,7 +15,7 @@ import javax.persistence.Entity;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Entity
+@Entity(name = "Connection")
 public class ConnectionEntity extends BaseEntity {
 
     @Column(name = "name", nullable = false)
