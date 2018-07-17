@@ -64,7 +64,7 @@ public class ConnectionsApi {
         return ResponseEntity.ok(deletedConnection);
     }
 
-    @GetMapping(path = "/{id}/schema")
+    @GetMapping(path = "/{id}/schemas")
     public ResponseEntity<List<Schema>> getSchemas(@PathVariable("id") Long id) throws SQLException {
         log.debug("getting schemas: {}", id);
         Connection connection = connectionsService.get(id);
@@ -72,7 +72,7 @@ public class ConnectionsApi {
         return ResponseEntity.ok(schemas);
     }
 
-    @GetMapping(path = "/{id}/schema/{schemaName}/table")
+    @GetMapping(path = "/{id}/schemas/{schemaName}/tables")
     public ResponseEntity<List<Table>> getTables(@PathVariable("id") Long id, @PathVariable("schemaName") String schemaName) throws SQLException {
         log.debug("getting table for connection {} and schema {}", id, schemaName);
         Connection connection = connectionsService.get(id);
@@ -80,7 +80,7 @@ public class ConnectionsApi {
         return ResponseEntity.ok(tables);
     }
 
-    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/column")
+    @GetMapping(path = "/{id}/schemas/{schemaName}/tables/{tableName}/columns")
     public ResponseEntity<List<Column>> getColumns(
             @PathVariable("id") Long id,
             @PathVariable("schemaName") String schemaName,
@@ -92,7 +92,7 @@ public class ConnectionsApi {
         return ResponseEntity.ok(columns);
     }
 
-    @GetMapping(path = "/{id}/schema/{schemaName}/table/{tableName}/preview")
+    @GetMapping(path = "/{id}/schemas/{schemaName}/tables/{tableName}/preview")
     public ResponseEntity<Preview> getPreview(
             @PathVariable("id") Long id,
             @PathVariable("schemaName") String schemaName,

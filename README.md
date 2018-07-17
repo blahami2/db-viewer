@@ -6,8 +6,44 @@
 
 # DB viewer
 
-## Check out the API
-- available at [https://app.apiary.io/dbviewer](https://app.apiary.io/dbviewer)
+## Description
+- REST API capable of storing connection details and basic database analysis (currently only supports _PostgreSQL_)
 
-## Try it out
+### Check out the API
+- available at [https://dbviewer.docs.apiary.io/#](https://dbviewer.docs.apiary.io/#)
+
+### Try it out
 - available at [https://db-viewer.herokuapp.com](https://db-viewer.herokuapp.com/)
+
+## Run
+
+### Prerequisites
+- running _PostgreSQL_ database
+- default properties for _dev_ profile:
+    ```properties
+    spring.datasource.url=jdbc:postgresql://localhost:5432/dbviewer
+    spring.datasource.username=postgres
+    spring.datasource.password=postgres
+    spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+    ```
+
+### Execution
+- run locally using the following:
+    ```bash
+    mvn spring-boot:run '-Dspring-boot.run.profiles=dev'
+    ```
+    
+## Contribute
+
+### Build
+
+#### Prerequisites
+- docker
+- maven
+- jdk
+
+TODO
+
+## More
+- see more at local [wiki](https://github.com/blahami2/db-viewer/wiki)
+ 
